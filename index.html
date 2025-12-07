@@ -1,0 +1,157 @@
+﻿<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>温馨提示弹窗</title>
+    <style>
+        body {
+            margin: 0;
+            padding: 0;
+            font-family: "微软雅黑", sans-serif;
+            background-color: #f0f0f0;
+        }
+
+        /* 批量弹窗样式 */
+        .popup {
+            position: fixed;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+            font-size: 16px;
+            text-align: center;
+            width: 250px;
+            height: 60px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 9999;
+        }
+
+        /* 初始单独弹窗样式（绝对居中） */
+        .init-popup {
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            width: 400px;
+            padding: 40px 20px;
+            border-radius: 16px;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.25);
+            background-color: #fff;
+            text-align: center;
+            z-index: 99999;
+            box-sizing: border-box;
+            /* 增加渐隐动画 */
+            transition: opacity 0.5s ease-out;
+        }
+
+        /* 初始弹窗标题/内容样式 */
+        .init-popup-title {
+            font-size: 24px;
+            color: #e63946;
+            margin: 0 0 15px 0;
+            font-weight: bold;
+        }
+
+        .init-popup-content {
+            font-size: 18px;
+            color: #333;
+            line-height: 1.6;
+            margin: 0;
+        }
+    </style>
+</head>
+<body>
+    <script>
+        // ========== 初始弹窗配置（单独编辑） ==========
+        const INIT_POPUP_CONFIG = {
+            title: "✨ 温馨提示 ✨",       // 弹窗标题
+            content: "吉嘉楠\n准备好接收满满的温暖啦～", // 弹窗内容
+            showTime: 2000                // 弹窗显示时长（毫秒，2000=2秒）
+        };
+
+        // ========== 批量弹窗配置 ==========
+        let popupInterval;
+        const tips = [
+            "多喝水呀~", "保持微笑", "每天都要元气满满", "保持好心情", "好好爱自己",
+            "梦想成真", "顺顺利利", "早点休息", "愿所有烦恼都消失", "别熬夜", "注意保暖",
+            "远离让你人烦的事", "要微笑", "要开心", "要快乐", "要健康", "要平安", "要顺利",
+            "要幸福", "要好运"
+        ];
+        const bgColors = [
+            'lightpink', 'skyblue', 'lightgreen', 'lavender', 'lightyellow', 'plum',
+            'coral', 'bisque', 'aquamarine', 'mistyrose', 'honeydew', 'peachpuff',
+            'paleturquoise', 'lavenderblush', 'oldlace', 'lemonchiffon', 'lightcyan',
+            'lightgray'
+        ];
+        let windowCount = 550; // 批量弹窗总数
+        let currentCount = 0;
+
+        // 创建批量温馨弹窗
+        function createPopup() {
+            if (currentCount >= windowCount) {
+                clearInterval(popupInterval);
+                popupInterval = null;
+                return;
+            }
+            currentCount++;
+            const popup = document.createElement('div');
+            popup.className = 'popup';
+            const screenWidth = window.innerWidth;
+            const screenHeight = window.innerHeight;
+            const popupWidth = 250;
+            const popupHeight = 60;
+            const x = Math.floor(Math.random() * (screenWidth - popupWidth));
+            const y = Math.floor(Math.random() * (screenHeight - popupHeight));
+            popup.style.left = `${x}px`;
+            popup.style.top = `${y}px`;
+            popup.style.backgroundColor = bgColors[Math.floor(Math.random() * bgColors.length)];
+            popup.textContent = tips[Math.floor(Math.random() * tips.length)];
+            document.body.appendChild(popup);
+            // 弹窗3秒后自动消失
+            setTimeout(() => {
+                if (popup.parentNode) {
+                    popup.parentNode.removeChild(popup);
+                }
+            }, 3000);
+        }
+
+        // 启动批量弹窗
+        function startPopup() {
+            if (!popupInterval) {
+                currentCount = 0;
+                popupInterval = setInterval(createPopup, 50);
+            }
+        }
+
+        // 创建并自动关闭初始弹窗
+        function createAndAutoCloseInitPopup() {
+            // 1. 创建初始弹窗
+            const initPopup = document.createElement('div');
+            initPopup.className = 'init-popup';
+            initPopup.innerHTML = `
+                    <div class="init-popup-title">${INIT_POPUP_CONFIG.title}</div>
+                    <div class="init-popup-content">${INIT_POPUP_CONFIG.content.replace(/\n/g, '<br>')}</div>
+                `;
+            document.body.appendChild(initPopup);
+
+            // 2. 延迟指定时间后自动关闭弹窗并启动批量弹窗
+            setTimeout(() => {
+                // 先渐隐
+                initPopup.style.opacity = 0;
+                // 动画结束后移除弹窗，启动批量弹窗
+                setTimeout(() => {
+                    initPopup.remove();
+                    startPopup();
+                }, 500); // 与css中的transition时长一致
+            }, INIT_POPUP_CONFIG.showTime);
+        }
+
+        // 页面加载后自动执行
+        window.onload = function () {
+            createAndAutoCloseInitPopup();
+        };
+    </script>
+</body>
+</html>
